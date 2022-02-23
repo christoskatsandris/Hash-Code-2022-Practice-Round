@@ -58,10 +58,10 @@ def main():
         clients.clear()
         ingredients.clear()
 
-        readData(f"{filename}.in.txt")
+        readData(f"Inputs\\{filename}.in.txt")
         sortClientsByPoints()
         pizza = makePizza()
-        logData(f"{filename}.out.txt", pizza)
+        logData(f"Outputs\\{filename}.out.txt", pizza)
         print(f"{filename} done.")
 
 def readData(filename):
