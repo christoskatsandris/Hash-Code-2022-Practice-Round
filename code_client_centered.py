@@ -2,16 +2,22 @@ class Client:
     def __init__(self):
         self.likedIngredients = []
         self.dislikedIngredients = []
-        self.points = 0
+        self.likedIngredientsPercentage = 0
+        self.dislikedIngredientsPercentage = 0
+        self.score = 0
     
     def addLikedIngredient(self, ingredient):
         self.likedIngredients.append(ingredient)
+        self.calcPercentages()
     
     def addDislikedIngredient(self, ingredient):
         self.dislikedIngredients.append(ingredient)
+        self.calcPercentages()
 
-    def calcPoints(self):
-        self.points = len(self.likedIngredients) - len(self.dislikedIngredients)
+    def calcPercentages(self):
+        self.likedIngredientsPercentage = len(self.likedIngredients) / (len(self.likedIngredients) + len(self.dislikedIngredients))
+        self.dislikedIngredientsPercentage = len(self.dislikedIngredients) / (len(self.likedIngredients) + len(self.dislikedIngredients))
+        self.score = self.likedIngredientsPercentage - self.dislikedIngredientsPercentage
     
 class Pizza:
     def __init__(self):
@@ -38,16 +44,12 @@ class Ingredient:
         self.name = name
         self.likedBy = 0
         self.dislikedBy = 0
-        self.points = 0
 
     def addLike(self):
         self.likedBy += 1
 
     def addDislike(self):
         self.dislikedBy += 1
-
-    def calcPoints(self):
-        self.points = self.likedBy - self.dislikedBy
 
 clients = []
 ingredients = []
@@ -59,8 +61,8 @@ def main():
         ingredients.clear()
 
         readData(f"Inputs\\{filename}.in.txt")
-        sortClientsByPoints()
-        pizza = makePizza()
+        sortClients()
+        pizza = makePizza(filename)
         logData(f"Outputs\\{filename}.out.txt", pizza)
         print(f"{filename} done.")
 
@@ -92,17 +94,19 @@ def getIngredient(ingredient):
     ingredients.append(newIngredient)
     return newIngredient
 
-def sortClientsByPoints():
-    for client in clients:
-        client.calcPoints()
-    clients.sort(key = lambda client: client.points, reverse=True)
+def sortClients():
+    clients.sort(key = lambda client: client.score, reverse=True)
 
-def makePizza():
+def makePizza(filename):
     newPizza = Pizza()
 
     for client in clients:
-        if client.points < 0:
-            break
+        if filename != "d_difficult":
+            if client.score < 0.3:
+                break
+        else:
+            if client.score < 1:
+                break
         for likedIngredient in client.likedIngredients:
             newPizza.addIngredient(likedIngredient)
         for dislikedIngredient in client.dislikedIngredients:
